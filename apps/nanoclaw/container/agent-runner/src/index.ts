@@ -23,6 +23,7 @@ import {
   PreCompactHookInput,
 } from '@anthropic-ai/claude-agent-sdk';
 import { fileURLToPath } from 'url';
+import { resolveSearch, type SearchProvider } from './search.js';
 
 interface ContainerInput {
   prompt: string;
@@ -33,6 +34,8 @@ interface ContainerInput {
   isScheduledTask?: boolean;
   assistantName?: string;
   script?: string;
+  webSearch?: SearchProvider;
+  hasSearchCredentials?: boolean;
 }
 
 interface ContainerOutput {
@@ -435,6 +438,11 @@ async function runQuery(
     log(`Additional directories: ${extraDirs.join(', ')}`);
   }
 
+  const search = resolveSearch(
+    containerInput.webSearch,
+    containerInput.hasSearchCredentials,
+  );
+
   for await (const message of query({
     prompt: stream,
     options: {
@@ -469,12 +477,15 @@ async function runQuery(
         'Skill',
         'NotebookEdit',
         'mcp__nanoclaw__*',
+        ...search.allowedTools,
       ],
+      disallowedTools: search.disallowedTools,
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
       allowDangerouslySkipPermissions: true,
       settingSources: ['project', 'user'],
       mcpServers: {
+        ...search.mcpServers,
         nanoclaw: {
           command: 'node',
           args: [mcpServerPath],

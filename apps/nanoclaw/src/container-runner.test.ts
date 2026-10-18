@@ -24,6 +24,8 @@ vi.mock('./config.js', () => ({
   MONOREPO_PATH: '',
   WORKTREE_BASE: '/tmp/nanoclaw-worktrees',
   TIMEZONE: 'America/Los_Angeles',
+  WEB_SEARCH_PROVIDER: 'auto',
+  HAS_SEARCH_CREDENTIALS: false,
 }));
 
 // Mock logger
@@ -234,6 +236,17 @@ describe('container-runner timeout behavior', () => {
     const result = await resultPromise;
     expect(result.status).toBe('success');
     expect(result.newSessionId).toBe('session-456');
+  });
+
+  it('forwards the host-wide search choice without adding a per-group selector', async () => {
+    const resultPromise = runContainerAgent(testGroup, testInput, () => {});
+    await vi.advanceTimersByTimeAsync(10);
+    const input = JSON.parse(fakeProc.stdin.read().toString());
+    expect(input).toMatchObject({ webSearch: 'auto', hasSearchCredentials: false });
+    expect(input).not.toHaveProperty('PARALLEL_API_KEY');
+    fakeProc.emit('close', 0);
+    await vi.advanceTimersByTimeAsync(10);
+    await resultPromise;
   });
 });
 
@@ -546,6 +559,8 @@ describe('OneCLI guard — ONECLI_URL empty', () => {
       ONECLI_URL: '', // intentionally empty — exercises the guard branch
       ONECLI_API_KEY: '',
       TIMEZONE: 'UTC',
+      WEB_SEARCH_PROVIDER: 'auto',
+      HAS_SEARCH_CREDENTIALS: false,
       MONOREPO_PATH: '',
       WORKTREE_BASE: '/tmp/nanoclaw-worktrees',
     }));

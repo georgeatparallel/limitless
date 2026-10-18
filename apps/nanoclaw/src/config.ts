@@ -11,6 +11,8 @@ const envConfig = readEnvFile([
   'ONECLI_URL',
   'ONECLI_API_KEY',
   'TZ',
+  'NANOCLAW_WEB_SEARCH',
+  'PARALLEL_API_KEY',
   // GitHub App credentials for DR-001 Phase 3 container identity injection.
   // Optional — if absent, container-runner falls back to GH_TOKEN (CEO PAT).
   'LIMITLESS_APP_ID',
@@ -31,6 +33,13 @@ export const ASSISTANT_HAS_OWN_NUMBER =
   (process.env.ASSISTANT_HAS_OWN_NUMBER ||
     envConfig.ASSISTANT_HAS_OWN_NUMBER) === 'true';
 export const POLL_INTERVAL = 2000;
+// Host-wide search choice: every group runs the same feature-skill runtime.
+export const WEB_SEARCH_PROVIDER =
+  process.env.NANOCLAW_WEB_SEARCH || envConfig.NANOCLAW_WEB_SEARCH || 'auto';
+// Retain authenticated installations; never pass the secret into a container.
+export const HAS_SEARCH_CREDENTIALS = !!(
+  process.env.PARALLEL_API_KEY || envConfig.PARALLEL_API_KEY
+);
 export const SCHEDULER_POLL_INTERVAL = 60000;
 
 // Absolute paths needed for container mounts

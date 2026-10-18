@@ -18,6 +18,8 @@ import {
   TIMEZONE,
   MONOREPO_PATH,
   WORKTREE_BASE,
+  WEB_SEARCH_PROVIDER,
+  HAS_SEARCH_CREDENTIALS,
 } from './config.js';
 import { resolveGroupFolderPath, resolveGroupIpcPath } from './group-folder.js';
 import { logger } from './logger.js';
@@ -512,7 +514,13 @@ export async function runContainerAgent(
     let stdoutTruncated = false;
     let stderrTruncated = false;
 
-    container.stdin.write(JSON.stringify(input));
+    container.stdin.write(
+      JSON.stringify({
+        ...input,
+        webSearch: WEB_SEARCH_PROVIDER,
+        hasSearchCredentials: HAS_SEARCH_CREDENTIALS,
+      }),
+    );
     container.stdin.end();
 
     // Streaming output: parse OUTPUT_START/END marker pairs as they arrive
