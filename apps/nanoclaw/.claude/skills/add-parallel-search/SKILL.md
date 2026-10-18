@@ -16,7 +16,7 @@ the maintained feature branch:
 
 ```bash
 git fetch origin skill/parallel-search
-git merge origin/skill/parallel-search
+git merge --no-ff origin/skill/parallel-search
 ```
 
 Use the remote for `LIMITLESS-LONGEVITY/limitless` if it is named differently.
@@ -58,7 +58,7 @@ existing settings instead of the anonymous default.
 From `apps/nanoclaw`:
 
 ```bash
-npm install
+npm install --legacy-peer-deps --package-lock=false
 npm run build
 npm test
 npm --prefix container/agent-runner ci
